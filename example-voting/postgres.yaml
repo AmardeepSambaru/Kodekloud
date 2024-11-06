@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deploy
+  labels:
+    app: testing-postgres-deploy
+spec:
+  selector:
+    matchLabels:
+      app: testing-postgres-pod
+  template:
+    metadata:
+      name: postgres-app
+      labels:
+        app: testing-postgres-pod
+    spec:
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "postgres"
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: trust    
+  replicas: 2
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels:
+    app: testing-postgres-svc
+spec:
+  selector:
+    app: testing-postgres-pod
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
